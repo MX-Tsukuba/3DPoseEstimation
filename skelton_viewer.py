@@ -13,12 +13,14 @@ connections = [
     (8, 11), (11, 12), (12, 13),  # 右脚
     (8, 14), (14, 15), (15, 16)  # 左脚
 ]
+# グローバル変数
+skeleton_data = None
 
 def load_skeleton_data(npz_file):
     data = np.load(npz_file)
     return data['reconstruction']
 
-def visualize_skeleton(skeleton_data):
+def visualize_skeleton(data, on_complete):
     print("Shape of skeleton data:", skeleton_data.shape)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -63,13 +65,23 @@ def visualize_skeleton(skeleton_data):
                 print(f"Invalid index: start={start}, end={end}, frame.shape={frame.shape}")
 
         plt.pause(0.1)
+        # 再生が終わったらコールバックを呼び出す
+        root.after(2000, on_complete)  # 2秒後に再生終了と仮定
     plt.show()
 
 def open_file():
+    global skeleton_data
     file_path = filedialog.askopenfilename(filetypes=[("NPZ files", "*.npz")])
     if file_path:
         skeleton_data = load_skeleton_data(file_path)
-        visualize_skeleton(skeleton_data)
+        visualize_skeleton(skeleton_data, on_playback_complete)
+        
+def reset_playback():
+    if skeleton_data is not None and skeleton_data.size > 0:
+        visualize_skeleton(skeleton_data, on_playback_complete)
+
+def on_playback_complete():
+    reset_button.pack(pady=10)
 
 # tkinterを使ったシンプルなGUIの作成
 root = tk.Tk()
@@ -78,5 +90,8 @@ root.geometry("300x100")
 
 open_button = tk.Button(root, text="Open NPZ File", command=open_file)
 open_button.pack(pady=20)
+
+reset_button = tk.Button(root, text="Reset Playback", command=reset_playback)
+reset_button.pack_forget()  # 初期状態では非表示でOpen NPZ FIleボタンの下に出現
 
 root.mainloop()
