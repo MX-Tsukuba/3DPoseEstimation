@@ -145,7 +145,7 @@ static
 *.bin
 
 # ignore file.npz
-*.npz
+# *.npz
 
 # ignore file.pth
 *.pth
