@@ -31,10 +31,10 @@ def angle_between_points(point1, point2):
     norm_z = np.linalg.norm(z)
     
     # 角度を計算
-    cos_t = dot / (norm_v * norm_z)
+    t_cos = dot / (norm_v * norm_z)
     
     #arccosでラジアン角度を求める
-    t_rad = np.arccos(np.clip(cos_t, -1.0, 1.0))
+    t_rad = np.arccos(np.clip(t_cos, -1.0, 1.0))
     
     # ラジアン角度を度に変換
     t_deg = math.degrees(t_rad)
