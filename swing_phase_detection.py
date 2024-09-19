@@ -1,11 +1,8 @@
 import json
 import numpy as np
+import sys
 import matplotlib.pyplot as plt
-
-# 関節名とjoint_indexのマッピング
-keypoint_indices = {
-    "left_wrist": 13,
-}
+from joint_mappings import keypoint_indices  # Import joint mappings from separate file
 
 def load_swing_data(json_file):
     """
@@ -54,12 +51,10 @@ def find_top_impact(crossing_points, z_coords):
 
     for i in range(1, len(crossing_points) - 1):
         if crossing_points[i-1][1] == 'up' and crossing_points[i][1] == 'down':
-            # 上昇で中点を超えたフレームと減少で中点を超えたフレームの間で最大のZ座標をトップとする
             start, end = crossing_points[i-1][0], crossing_points[i][0]
             top_frame = np.argmax(z_coords[start:end]) + start
 
         if crossing_points[i][1] == 'down' and crossing_points[i+1][1] == 'up':
-            # 減少で中点を超えたフレームと再び上昇で中点を超えたフレームの間で最小のZ座標をインパクトとする
             start, end = crossing_points[i][0], crossing_points[i+1][0]
             impact_frame = np.argmin(z_coords[start:end]) + start
 
@@ -131,8 +126,12 @@ def visualize_phases(frames, z_coords, phases):
     plt.show()
 
 def main():
+    if len(sys.argv) != 2:
+        print("Usage: python detect_swing_phases.py <json_file>")
+        sys.exit(1)
+
     # JSONデータのファイル名
-    json_file = 'sample_output.json' 
+    json_file = sys.argv[1]
 
     # スイングデータをロード
     frames = load_swing_data(json_file)
